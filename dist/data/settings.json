@@ -6,5 +6,6 @@
   "burn": {
     "pending": 0,
     "total": 0
-  }
+  },
+  "lastOrderId": 1
 }

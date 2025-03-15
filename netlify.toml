@@ -1,0 +1,14 @@
+[[redirects]]
+  from = "/login"
+  to = "/admin"
+  status = 301
+
+[[redirects]]
+  from = "/login/"
+  to = "/admin"
+  status = 301
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

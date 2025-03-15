@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 export const Purchase: React.FC = () => {
   const { id } = useParams();
-  const { nfts, addOrder, incrementSoldCount } = useStore();
+  const { nfts, addOrder, incrementSoldCount, formatPrice } = useStore();
   const [walletAddress, setWalletAddress] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [walletAddressError, setWalletAddressError] = useState('');
@@ -56,8 +56,12 @@ export const Purchase: React.FC = () => {
               <img src={nft.image} alt={nft.title} className="w-full rounded-xl" />
               <h2 className="text-3xl font-bold text-white mt-6 mb-4">{nft.title}</h2>
               <p className="text-gray-400 mb-4">{nft.description}</p>
-              <p className="text-2xl font-bold text-emerald-400 mb-6">{nft.price} MemeX</p>
-              <p className="text-gray-400">
+              <div className="mb-6 text-center">
+                <p className="text-emerald-400 text-lg font-semibold">{formatPrice(nft.price)} MemeX</p>
+                <p className="text-white font-bold">OR</p>
+                <p className="text-blue-400 text-lg font-semibold">{formatPrice(nft.priceXEP)} XEP</p>
+              </div>
+              <p className="text-gray-400 text-center">
                 {nft.soldCount}/{nft.mintCount} Minted
               </p>
             </div>
