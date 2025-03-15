@@ -95,8 +95,8 @@ export const Purchase: React.FC = () => {
 
               <div className="bg-blue-900/50 p-4 rounded-lg mb-6">
                 <p className="text-sm text-blue-200">
-                  Important: Send exactly {nft.price} MemeX to the payment address. Your NFT will be transferred to your
-                  wallet address after payment confirmation.
+                  Important: Send exactly {formatPrice(nft.price)} MemeX OR {formatPrice(nft.priceXEP)} XEP to the payment
+                  address. Your NFT will be transferred to your wallet address after payment confirmation.
                 </p>
               </div>
 
