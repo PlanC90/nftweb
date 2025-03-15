@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStore } from '../store';
 import { QRCodeSVG } from 'qrcode.react';
@@ -8,27 +8,9 @@ export const Purchase: React.FC = () => {
   const { nfts, addOrder, incrementSoldCount } = useStore();
   const [walletAddress, setWalletAddress] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
-  const [xepPrice, setXepPrice] = useState<number | null>(null);
-  const [walletError, setWalletError] = useState('');
+  const [walletAddressError, setWalletAddressError] = useState('');
 
   const nft = nfts.find((n) => n.id === id);
-
-  useEffect(() => {
-    // Mock API call to fetch XEP price
-    const fetchXepPrice = async () => {
-      try {
-        // Replace with actual API endpoint
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=electra-protocol&vs_currencies=usd');
-        const data = await response.json();
-        setXepPrice(data['electra-protocol'].usd);
-      } catch (error) {
-        console.error("Failed to fetch XEP price:", error);
-        setXepPrice(0.0003);
-      }
-    };
-
-    fetchXepPrice();
-  }, []);
 
   if (!nft) {
     return <div>NFT not found</div>;
@@ -42,15 +24,16 @@ export const Purchase: React.FC = () => {
 
   const handleConfirmPayment = () => {
     if (!walletAddress) {
-      setWalletError('Wallet address is required.');
+      setWalletAddressError('Wallet address is required.');
       return;
     }
 
     if (!walletAddress.startsWith('x')) {
-      setWalletError('Wallet address must start with "x".');
+      setWalletAddressError('Wallet address must start with "x".');
       return;
     }
 
+    setWalletAddressError('');
     setPaymentConfirmed(true);
     addOrder({
       id: Date.now().toString(),
@@ -64,18 +47,6 @@ export const Purchase: React.FC = () => {
     alert('Payment confirmed!');
   };
 
-  const calculatedXepPrice = nft.price / 20;
-
-  const formattedXepPrice = calculatedXepPrice.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-
-  const formattedMemeXPrice = nft.price.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="container mx-auto px-6 max-w-4xl">
@@ -85,13 +56,7 @@ export const Purchase: React.FC = () => {
               <img src={nft.image} alt={nft.title} className="w-full rounded-xl" />
               <h2 className="text-3xl font-bold text-white mt-6 mb-4">{nft.title}</h2>
               <p className="text-gray-400 mb-4">{nft.description}</p>
-              <div className="mb-6 text-center">
-                <div className="text-2xl font-bold text-emerald-400">{formattedMemeXPrice} MemeX</div>
-                <div className="text-2xl font-bold text-white">OR</div>
-                {xepPrice !== null && (
-                  <div className="text-2xl font-bold text-blue-500">{formattedXepPrice} XEP</div>
-                )}
-              </div>
+              <p className="text-2xl font-bold text-emerald-400 mb-6">{nft.price} MemeX</p>
               <p className="text-gray-400">
                 {nft.soldCount}/{nft.mintCount} Minted
               </p>
@@ -105,14 +70,12 @@ export const Purchase: React.FC = () => {
                 <input
                   type="text"
                   value={walletAddress}
-                  onChange={(e) => {
-                    setWalletAddress(e.target.value);
-                    setWalletError('');
-                  }}
+                  onChange={(e) => setWalletAddress(e.target.value)}
                   placeholder="Enter your wallet address"
                   className="w-full bg-gray-800 text-white p-3 rounded-lg"
+                  required
                 />
-                {walletError && <p className="text-red-500 text-sm mt-1">{walletError}</p>}
+                {walletAddressError && <p className="text-red-500 text-sm mt-1">{walletAddressError}</p>}
                 <p className="text-sm text-gray-400 mt-2">The NFT will be transferred to this address after payment</p>
               </div>
 

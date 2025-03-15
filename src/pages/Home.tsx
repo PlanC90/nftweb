@@ -9,6 +9,7 @@ export const Home: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       <div className="container mx-auto px-6">
+        {/* MemeX Community Message */}
         {/* NFT Explanation Section */}
         <section className="mb-12 relative">
           <div className="relative overflow-hidden" style={{ height: '312.5px', marginBottom: '2rem' }}>

@@ -11,7 +11,7 @@ export const Marketplace: React.FC = () => {
         <h2 className="text-4xl font-bold text-white mb-12 text-center">
           NFT Marketplace
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {nfts.map((nft) => (
             <NFTCard key={nft.id} nft={nft} />
           ))}

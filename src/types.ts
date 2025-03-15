@@ -4,15 +4,8 @@ export interface NFT {
   description: string;
   image: string;
   price: number;
-  priceXEP?: number;
-  creator: string;
   mintCount: number;
   soldCount: number;
-}
-
-export interface User {
-  username: string;
-  password: string;
 }
 
 export interface Order {
@@ -21,6 +14,6 @@ export interface Order {
   customer: string;
   walletAddress: string;
   purchaseDate: string;
-  status: 'pending payment' | 'shipped' | 'cancelled';
+  status: string;
   nftId: string;
 }

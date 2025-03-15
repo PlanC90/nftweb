@@ -6,15 +6,14 @@ import { Admin } from './pages/Admin';
 import { Purchase } from './pages/Purchase';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { ScrollToTopButton } from './components/ScrollToTopButton';
 
 function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-gray-900">
-        <div className="container mx-auto max-w-7xl shadow-lg rounded-lg overflow-hidden">
+        <div className="container mx-auto px-4 flex-grow">
           <Header />
-          <main className="flex-grow">
+          <main className="py-8">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -22,9 +21,8 @@ function App() {
               <Route path="/purchase/:id" element={<Purchase />} />
             </Routes>
           </main>
-          <Footer />
-          <ScrollToTopButton />
         </div>
+        <Footer />
       </div>
     </Router>
   );
