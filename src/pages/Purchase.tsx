@@ -9,6 +9,7 @@ export const Purchase: React.FC = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [xepPrice, setXepPrice] = useState<number | null>(null);
+  const [walletError, setWalletError] = useState('');
 
   const nft = nfts.find((n) => n.id === id);
 
@@ -40,6 +41,16 @@ export const Purchase: React.FC = () => {
   const paymentAddress = 'x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv';
 
   const handleConfirmPayment = () => {
+    if (!walletAddress) {
+      setWalletError('Wallet address is required.');
+      return;
+    }
+
+    if (!walletAddress.startsWith('x')) {
+      setWalletError('Wallet address must start with "x".');
+      return;
+    }
+
     setPaymentConfirmed(true);
     addOrder({
       id: Date.now().toString(),
@@ -94,10 +105,14 @@ export const Purchase: React.FC = () => {
                 <input
                   type="text"
                   value={walletAddress}
-                  onChange={(e) => setWalletAddress(e.target.value)}
+                  onChange={(e) => {
+                    setWalletAddress(e.target.value);
+                    setWalletError('');
+                  }}
                   placeholder="Enter your wallet address"
                   className="w-full bg-gray-800 text-white p-3 rounded-lg"
                 />
+                {walletError && <p className="text-red-500 text-sm mt-1">{walletError}</p>}
                 <p className="text-sm text-gray-400 mt-2">The NFT will be transferred to this address after payment</p>
               </div>
 
