@@ -12,20 +12,32 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   const { formatPrice } = useStore();
 
   return (
-    <div className="bg-gray-800 rounded-xl shadow-md overflow-hidden relative transform transition-transform hover:scale-105 hover:shadow-lg">
-      <Link to={`/purchase/${nft.id}`}>
-        <img
-          src={nft.image}
-          alt={nft.title}
-          className="w-full h-64 object-cover"
-          style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }}
-        />
+    <div className="bg-gray-950 rounded-xl shadow-md overflow-hidden relative transform transition-transform hover:scale-105 hover:shadow-lg flex flex-col">
+      <Link to={`/purchase/${nft.id}`} className="block">
+        <div className="relative">
+          <img
+            src={nft.image}
+            alt={nft.title}
+            className="w-full h-64 object-cover rounded-t-xl"
+            style={{ objectFit: 'cover' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-950 opacity-60"></div>
+        </div>
       </Link>
-      <div className="p-6">
+
+      <div className="p-6 flex-grow">
         <h3 className="text-xl font-bold text-white mb-2">{nft.title}</h3>
         <p className="text-gray-400 mb-4 h-24 overflow-hidden">{nft.description}</p>
-        <p className="text-emerald-400 text-lg font-semibold">{formatPrice(nft.price)} MemeX</p>
-        <p className="text-gray-400">
+
+        <hr className="border-gray-700 my-4 shadow-lg" />
+
+        <div className="mb-2 text-center">
+          <p className="text-emerald-400 text-lg font-semibold">{formatPrice(nft.price)} MemeX</p>
+          <p className="text-white font-bold">OR</p>
+          <p className="text-blue-400 text-lg font-semibold">{formatPrice(nft.priceXEP)} XEP</p>
+        </div>
+        <hr className="border-gray-700 my-4 shadow-lg" />
+        <p className="text-gray-400 text-center">
           {nft.soldCount}/{nft.mintCount} Minted
         </p>
         {isSoldOut && (
@@ -34,6 +46,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
           </div>
         )}
       </div>
+
       <div className="p-4">
         <Link to={`/purchase/${nft.id}`}>
           <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-bold transition-colors flex items-center justify-center">

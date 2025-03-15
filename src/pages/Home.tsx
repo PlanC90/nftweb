@@ -8,7 +8,8 @@ export const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 py-12">
-      <div className="container mx-auto px-6">
+      {/* Boxed Container */}
+      <div className="container mx-auto p-6 rounded-lg shadow-xl bg-gray-800">
         {/* MemeX Community Message */}
         {/* NFT Explanation Section */}
         <section className="mb-12 relative">
