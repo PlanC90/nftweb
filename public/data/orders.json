@@ -1,13 +1,3 @@
 {
-  "orders": [
-    {
-      "id": "00002",
-      "nftTitle": "MemeX NFT #2",
-      "customer": "Customer Name",
-      "walletAddress": "x2025",
-      "purchaseDate": "15.03.2025",
-      "nftId": "2",
-      "status": "shipped"
-    }
-  ]
+  "orders": []
 }

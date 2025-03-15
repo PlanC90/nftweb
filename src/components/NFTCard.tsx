@@ -23,7 +23,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       </Link>
       <div className="p-6">
         <h3 className="text-xl font-bold text-white mb-2">{nft.title}</h3>
-        <p className="text-gray-400 mb-4 h-40 overflow-hidden">{nft.description}</p>
+        <p className="text-gray-400 mb-4 h-24 overflow-hidden">{nft.description}</p>
         <p className="text-emerald-400 text-lg font-semibold">{formatPrice(nft.price)} MemeX</p>
         <p className="text-gray-400">
           {nft.soldCount}/{nft.mintCount} Minted
