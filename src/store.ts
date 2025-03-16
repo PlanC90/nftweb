@@ -165,10 +165,10 @@ const useStore = create<StoreState>()(
           }
 
           const availableQuantity = Math.min(quantity, nft.mintCount - nft.soldCount);
+          const newOrderId = String(state.lastOrderId + 1).padStart(5, '0');
 
-          const orderId = uuidv4();
           const newOrder: Order = {
-            id: orderId,
+            id: newOrderId,
             nftTitle: nft.title,
             customer,
             walletAddress,
@@ -183,13 +183,15 @@ const useStore = create<StoreState>()(
 
           const updatedOrders = [...state.orders, newOrder];
 
+          // Save all changes to files
           saveNFTsToFile(updatedNFTs);
           saveOrdersToFile(updatedOrders);
-          saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, state.lastOrderId + 1);
 
           return {
             nfts: updatedNFTs,
             orders: updatedOrders,
+            lastOrderId: state.lastOrderId + 1
           };
         });
       },
@@ -200,28 +202,23 @@ const useStore = create<StoreState>()(
             order.id === orderId ? { ...order, ...updates } : order
           );
           saveOrdersToFile(updatedOrders);
-          saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId);
           return { orders: updatedOrders };
         });
       },
 
       addOrder: async (order) => {
-        set(async (state) => {
-          const newOrderId = String(get().lastOrderId + 1).padStart(5, '0');
+        set((state) => {
+          const newOrderId = String(state.lastOrderId + 1).padStart(5, '0');
           const newOrder = { ...order, id: newOrderId, status: 'pending payment' };
           const updatedOrders = [...state.orders, newOrder];
-      
-          try {
-            await saveOrdersToFile(updatedOrders);
-            await saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId + 1);
-            return {
-              orders: updatedOrders,
-              lastOrderId: state.lastOrderId + 1,
-            };
-          } catch (error) {
-            console.error("Error adding order:", error);
-            return state;
-          }
+          
+          saveOrdersToFile(updatedOrders);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, state.lastOrderId + 1);
+          
+          return {
+            orders: updatedOrders,
+            lastOrderId: state.lastOrderId + 1
+          };
         });
       },
 

@@ -70,7 +70,6 @@ app.put('/data/nft.json', async (req, res) => {
     await fs.writeFile(NFT_FILE, JSON.stringify(req.body, null, 2));
     res.json({ success: true });
   } catch (error) {
-    console.error('Failed to write NFT data:', error);
     res.status(500).json({ error: 'Failed to write NFT data' });
   }
 });
@@ -80,7 +79,6 @@ app.put('/data/orders.json', async (req, res) => {
     await fs.writeFile(ORDERS_FILE, JSON.stringify(req.body, null, 2));
     res.json({ success: true });
   } catch (error) {
-    console.error('Failed to write orders data:', error);
     res.status(500).json({ error: 'Failed to write orders data' });
   }
 });
@@ -90,7 +88,6 @@ app.put('/data/settings.json', async (req, res) => {
     await fs.writeFile(SETTINGS_FILE, JSON.stringify(req.body, null, 2));
     res.json({ success: true });
   } catch (error) {
-    console.error('Failed to write settings data:', error);
     res.status(500).json({ error: 'Failed to write settings data' });
   }
 });
