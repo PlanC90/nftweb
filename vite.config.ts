@@ -11,8 +11,9 @@ export default defineConfig({
       '/data': 'http://localhost:3000'
     },
     hmr: {
-      overlay: false
-    }
+      overlay: false,
+      protocol: 'ws',
+    },
   },
   build: {
     outDir: 'dist',

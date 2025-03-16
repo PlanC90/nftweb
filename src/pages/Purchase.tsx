@@ -20,7 +20,7 @@ export const Purchase: React.FC = () => {
     return <div>This NFT is sold out.</div>;
   }
 
-  const paymentAddress = 'x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv';
+  const paymentAddress = 'xTSNVy4GLEDETscV2HFQ8HoThzpWWmxArP';
 
   const handleConfirmPayment = () => {
     if (!walletAddress) {
