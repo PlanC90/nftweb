@@ -4,9 +4,6 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-950 text-white py-6 mt-auto">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-4">
-          Need assistance? 🚀 DM us on X (Twitter) for direct support! 🔒
-        </div>
         <div className="text-sm text-gray-400 mb-4 text-center">
           <h6 className="font-bold">Legal Disclaimer</h6>
           <p>
@@ -15,20 +12,18 @@ export const Footer: React.FC = () => {
             risks associated with smart contracts. MemeX is not a registered
             broker, analyst, or investment advisor. If you have purchased
             $MemeX, you agree that you are not purchasing a security or
-            investment. The MemeX team cannot be held liable for any losses or
-            taxes you may incur. You also agree that the team is representing
-            the token as community members and cannot modify the contract due
-            to it being renounced. Do conduct your own due diligence and
-            consult your financial advisor before making any investment
-            decision.
+            investment. You also agree that the team is representing
+            the token as community members and cannot modify the contract due to
+            it being renounced. Do conduct your own due diligence and consult
+            your financial advisor before making any investment decision.
           </p>
         </div>
         <div className="text-center mb-4">
           <h6>Follow us on social media</h6>
-          <a href="#" className="mr-2">
+          <a href="https://x.com/memexairdrop" className="mr-2">
             🐦
           </a>
-          <a href="#">
+          <a href="https://t.me/MemeXGloball">
             ✈️
           </a>
         </div>
@@ -40,7 +35,9 @@ export const Footer: React.FC = () => {
           transactions, and ultimate security!
         </div>
         <div className="text-center text-gray-400 mt-2">
-          This site belongs to the MemeX Community. The fee for each NFT sold will be burned. NFTs sold via XEP will buy MEMEX from the market and burn it, while those sold directly with MEMEX will be burned directly.
+          This site belongs to the MemeX Community. The fee for each NFT sold
+          will be burned. NFTs sold via XEP will buy MEMEX from the market and
+          burn it, while those sold directly with MEMEX will be burned directly.
         </div>
       </div>
     </footer>

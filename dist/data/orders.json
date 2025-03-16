@@ -1,3 +1,49 @@
 {
-  "orders": []
+  "orders": [
+    {
+      "id": "00002",
+      "nftTitle": "MemeX NFT #20",
+      "customer": "Customer Name",
+      "walletAddress": "x2025",
+      "purchaseDate": "16.03.2025",
+      "nftId": "20",
+      "status": "shipped"
+    },
+    {
+      "id": "00003",
+      "nftTitle": "MemeX NFT #200",
+      "customer": "Customer Name",
+      "walletAddress": "x5000",
+      "purchaseDate": "16.03.2025",
+      "nftId": "e38da293-1c83-414a-9b76-f28ffe89de04",
+      "status": "pending payment"
+    },
+    {
+      "id": "00004",
+      "nftTitle": "MemeX NFT #2",
+      "customer": "Customer Name",
+      "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
+      "purchaseDate": "16.03.2025",
+      "nftId": "2",
+      "status": "shipped"
+    },
+    {
+      "id": "00005",
+      "nftTitle": "MemeX NFT #1",
+      "customer": "Customer Name",
+      "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
+      "purchaseDate": "16.03.2025",
+      "nftId": "1",
+      "status": "shipped"
+    },
+    {
+      "id": "00006",
+      "nftTitle": "MemeX NFT #21",
+      "customer": "Customer Name",
+      "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
+      "purchaseDate": "16.03.2025",
+      "nftId": "21",
+      "status": "pending payment"
+    }
+  ]
 }

@@ -4,8 +4,8 @@
     "password": "Ceyhun8387@"
   },
   "burn": {
-    "pending": 0,
-    "total": 0
+    "pending": 400000,
+    "total": 10000
   },
-  "lastOrderId": 1
+  "lastOrderId": 6
 }

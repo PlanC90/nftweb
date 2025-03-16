@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
             <>
               <Link
                 to="/admin"
-                className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors"
+                className="bg-[rgb(17 24 39)] hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors"
               >
                 Admin Panel
               </Link>
@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
           ) : (
             <Link
               to="/login"
-              className="text-white hover:text-gray-300 px-4 py-2 rounded-lg transition-colors"
+              className="bg-[rgb(17 24 39)] hover:bg-green-600 px-4 py-2 rounded-lg transition-colors"
             >
               Admin
             </Link>

@@ -98,10 +98,21 @@ const vite = await createViteServer({
   appType: 'spa'
 });
 
+// Use Vite's middleware
 app.use(vite.middlewares);
 
+// Serve static files from the dist directory in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('dist'));
+  
+  // Handle client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(join(__dirname, 'dist', 'index.html'));
+  });
+}
+
 // Start server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

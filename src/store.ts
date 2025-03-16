@@ -26,6 +26,7 @@ interface StoreState {
   loadInitialData: () => Promise<void>;
 }
 
+// Helper function to save NFTs to JSON file
 const saveNFTsToFile = async (nfts: NFT[]) => {
   try {
     const response = await fetch('/data/nft.json', {
@@ -33,7 +34,7 @@ const saveNFTsToFile = async (nfts: NFT[]) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ nfts }),
+      body: JSON.stringify({ nfts }, null, 2),
     });
     if (!response.ok) {
       throw new Error('Failed to save NFTs');
@@ -43,35 +44,17 @@ const saveNFTsToFile = async (nfts: NFT[]) => {
   }
 };
 
-const saveOrdersToFile = async (orders: Order[], lastOrderId: number) => {
+// Helper function to save orders to JSON file
+const saveOrdersToFile = async (orders: Order[]) => {
   try {
     const response = await fetch('/data/orders.json', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ orders }),
+      body: JSON.stringify({ orders }, null, 2),
     });
-
-    const settingsResponse = await fetch('/data/settings.json', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        admin: {
-          username: 'PlanC',
-          password: 'Ceyhun8387@'
-        },
-        burn: {
-          pending: 0,
-          total: 0
-        },
-        lastOrderId: lastOrderId
-      }),
-    });
-
-    if (!response.ok || !settingsResponse.ok) {
+    if (!response.ok) {
       throw new Error('Failed to save orders');
     }
   } catch (error) {
@@ -79,7 +62,8 @@ const saveOrdersToFile = async (orders: Order[], lastOrderId: number) => {
   }
 };
 
-const saveBurnData = async (pendingBurn: number, burnedAmount: number) => {
+// Helper function to save settings to JSON file
+const saveSettingsToFile = async (pendingBurn: number, burnedAmount: number, lastOrderId: number) => {
   try {
     const response = await fetch('/data/settings.json', {
       method: 'PUT',
@@ -95,14 +79,14 @@ const saveBurnData = async (pendingBurn: number, burnedAmount: number) => {
           pending: pendingBurn,
           total: burnedAmount
         },
-        lastOrderId: get().lastOrderId
-      }),
+        lastOrderId: lastOrderId
+      }, null, 2),
     });
     if (!response.ok) {
-      throw new Error('Failed to save burn data');
+      throw new Error('Failed to save settings data');
     }
   } catch (error) {
-    console.error('Error saving burn data:', error);
+    console.error('Error saving settings data:', error);
   }
 };
 
@@ -200,7 +184,8 @@ const useStore = create<StoreState>()(
           const updatedOrders = [...state.orders, newOrder];
 
           saveNFTsToFile(updatedNFTs);
-          saveOrdersToFile(updatedOrders, get().lastOrderId);
+          saveOrdersToFile(updatedOrders);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId);
 
           return {
             nfts: updatedNFTs,
@@ -214,20 +199,29 @@ const useStore = create<StoreState>()(
           const updatedOrders = state.orders.map((order) => 
             order.id === orderId ? { ...order, ...updates } : order
           );
-          saveOrdersToFile(updatedOrders, get().lastOrderId);
+          saveOrdersToFile(updatedOrders);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId);
           return { orders: updatedOrders };
         });
       },
 
       addOrder: async (order) => {
-        const newOrderId = String(get().lastOrderId + 1).padStart(5, '0');
-        set((state) => {
-          const updatedOrders = [...state.orders, { ...order, id: newOrderId, status: 'pending payment' }];
-          saveOrdersToFile(updatedOrders, state.lastOrderId + 1);
-          return { 
-            orders: updatedOrders,
-            lastOrderId: state.lastOrderId + 1
-          };
+        set(async (state) => {
+          const newOrderId = String(get().lastOrderId + 1).padStart(5, '0');
+          const newOrder = { ...order, id: newOrderId, status: 'pending payment' };
+          const updatedOrders = [...state.orders, newOrder];
+      
+          try {
+            await saveOrdersToFile(updatedOrders);
+            await saveSettingsToFile(state.pendingBurn, state.burnedAmount, get().lastOrderId + 1);
+            return {
+              orders: updatedOrders,
+              lastOrderId: state.lastOrderId + 1,
+            };
+          } catch (error) {
+            console.error("Error adding order:", error);
+            return state;
+          }
         });
       },
 
@@ -274,7 +268,7 @@ const useStore = create<StoreState>()(
       updateBurnedAmount: (amount: number) => {
         set((state) => {
           const newBurnedAmount = amount;
-          saveBurnData(state.pendingBurn, newBurnedAmount);
+          saveSettingsToFile(state.pendingBurn, newBurnedAmount, get().lastOrderId);
           return { burnedAmount: newBurnedAmount };
         });
       },
@@ -282,7 +276,7 @@ const useStore = create<StoreState>()(
       updatePendingBurn: (amount: number) => {
         set((state) => {
           const newPendingBurn = state.pendingBurn + amount;
-          saveBurnData(newPendingBurn, state.burnedAmount);
+          saveSettingsToFile(newPendingBurn, state.burnedAmount, get().lastOrderId);
           return { pendingBurn: newPendingBurn };
         });
       },

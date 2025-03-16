@@ -15,6 +15,8 @@ import {
   X,
   PackageX,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -288,6 +290,14 @@ const NFTOrders: React.FC = () => {
   const { orders, updateOrder, nfts, updatePendingBurn } = useStore();
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [editedStatus, setEditedStatus] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 100;
+
+  // Calculate pagination
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
 
   const handleEditOrder = (orderId: string) => {
     setEditingOrderId(orderId);
@@ -320,13 +330,13 @@ const NFTOrders: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'shipped':
-        return 'bg-green-900/50'; // Light green
+        return 'bg-green-900/50';
       case 'pending payment':
-        return 'bg-orange-900/50'; // Light orange
+        return 'bg-orange-900/50';
       case 'cancelled':
-        return 'bg-red-900/50'; // Red
+        return 'bg-red-900/50';
       default:
-        return 'bg-gray-900/50'; // Default background color
+        return 'bg-gray-900/50';
     }
   };
 
@@ -358,7 +368,7 @@ const NFTOrders: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {orders.map((order) => (
+            {currentOrders.map((order) => (
               <tr key={order.id} className={getStatusColor(order.status)}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{order.id}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{order.nftTitle}</td>
@@ -401,6 +411,38 @@ const NFTOrders: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-4 text-white">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`p-2 rounded-lg ${
+                currentPage === 1 ? 'bg-gray-700 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`p-2 rounded-lg ${
+                currentPage === totalPages ? 'bg-gray-700 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="text-sm text-gray-400">
+            Showing {indexOfFirstOrder + 1} to {Math.min(indexOfLastOrder, orders.length)} of {orders.length} orders
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -687,7 +729,7 @@ const ExportImport: React.FC = () => {
   );
 };
 
-export const Admin: React.FC = () => {
+const Admin: React.FC = () => {
   const { isAuthenticated, pendingBurn, burnedAmount } = useStore();
   const [activeTab, setActiveTab] = useState('dashboard');
 
@@ -772,3 +814,7 @@ export const Admin: React.FC = () => {
     </div>
   );
 };
+
+export default Admin;
+
+export { Admin }
