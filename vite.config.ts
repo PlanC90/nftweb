@@ -14,6 +14,7 @@ export default defineConfig({
       overlay: false,
       protocol: 'ws',
     },
+    allowedHosts: ["nft.memextoken.org"]
   },
   build: {
     outDir: 'dist',
