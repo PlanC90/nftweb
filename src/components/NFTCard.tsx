@@ -11,6 +11,10 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
   const isSoldOut = nft.soldCount >= nft.mintCount;
   const { formatPrice } = useStore();
 
+  const handleClick = () => {
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden relative transform transition-transform hover:scale-105 hover:shadow-lg flex flex-col">
       <Link to={`/purchase/${nft.id}`} className="block">
@@ -48,7 +52,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
       </div>
 
       <div className="p-4">
-        <Link to={`/purchase/${nft.id}`}>
+        <Link to={`/purchase/${nft.id}`} onClick={handleClick}>
           <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg font-bold transition-colors flex items-center justify-center">
             Buy NFT
           </button>
