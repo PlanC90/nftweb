@@ -197,6 +197,61 @@
       "mintCount": 10,
       "soldCount": 0,
       "creator": "MemeX"
+    },
+    {
+      "id": "19",
+      "title": "MemeX NFT #19",
+      "description": "Limited edition MemeX NFT collection piece #19. Each NFT purchase contributes to MemeX token burning, enhancing the ecosystem's value.",
+      "image": "https://memex.planc.space/nft/memex_nft.jpg",
+      "price": 100000,
+      "priceXEP": 5000,
+      "mintCount": 10,
+      "soldCount": 1,
+      "creator": "MemeX"
+    },
+    {
+      "id": "20",
+      "title": "MemeX NFT #20",
+      "description": "Limited edition MemeX NFT collection piece #20. Each NFT purchase contributes to MemeX token burning, enhancing the ecosystem's value.",
+      "image": "https://memex.planc.space/nft/memex_nft.jpg",
+      "price": 100000,
+      "priceXEP": 5000,
+      "mintCount": 10,
+      "soldCount": 1,
+      "creator": "MemeX"
+    },
+    {
+      "id": "21",
+      "title": "MemeX NFT #21",
+      "description": "Limited edition MemeX NFT collection piece #21. Each NFT purchase contributes to MemeX token burning, enhancing the ecosystem's value.",
+      "image": "https://memex.planc.space/nft/memex_nft.jpg",
+      "price": 100000,
+      "priceXEP": 5000,
+      "mintCount": 10,
+      "soldCount": 0,
+      "creator": "MemeX"
+    },
+    {
+      "id": "9a96480b-95a0-4e78-beb9-74443b305e5a",
+      "title": "test",
+      "description": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv\n\n",
+      "image": "https://coincodex.com/images/coincodex-light.svg?v=1",
+      "price": 1000000,
+      "priceXEP": 10000000,
+      "mintCount": 100,
+      "creator": "Admin",
+      "soldCount": 0
+    },
+    {
+      "id": "0b0e7912-2e63-4028-8b50-5079cf490a80",
+      "title": "test2",
+      "description": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv\n\n",
+      "image": "https://stackblitz.com/avatars/B/171.svg",
+      "price": 100000,
+      "priceXEP": 10,
+      "mintCount": 1000,
+      "creator": "Admin",
+      "soldCount": 1
     }
   ]
 }
