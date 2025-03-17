@@ -792,8 +792,7 @@ const Admin: React.FC = () => {
             }`}
             onClick={() => setActiveTab('burnManagement')}
           >
-            Burn Management
-          </button>
+            Burn Management          </button>
           <button
             className={`bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg ${
               activeTab === 'exportImport' ? 'bg-gray-700' : ''
