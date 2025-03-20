@@ -25,8 +25,8 @@ function Root() {
       console.log('Received:', event.data);
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
+    ws.onclose = (event) => {
+      console.log('WebSocket disconnected', event.code, event.reason);
       // Attempt to reconnect after a delay
       setTimeout(setupWebSocket, 3000);
     };

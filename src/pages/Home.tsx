@@ -21,9 +21,9 @@ export const Home: React.FC = () => {
       setMessage(`Message from server: ${event.data}`);
     };
 
-    newSocket.onclose = () => {
-      console.log('WebSocket disconnected');
-      setMessage('WebSocket disconnected');
+    newSocket.onclose = (event) => {
+      console.log('WebSocket disconnected', event.code, event.reason);
+      setMessage(`WebSocket disconnected: ${event.code} - ${event.reason}`);
     };
 
     newSocket.onerror = (error) => {
