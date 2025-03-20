@@ -18,21 +18,21 @@ function Root() {
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
+      console.log('WebSocket connected in main.tsx');
     };
 
     ws.onmessage = (event) => {
-      console.log('Received:', event.data);
+      console.log('Received in main.tsx:', event.data);
     };
 
     ws.onclose = (event) => {
-      console.log('WebSocket disconnected', event.code, event.reason);
+      console.log('WebSocket disconnected in main.tsx', event.code, event.reason);
       // Attempt to reconnect after a delay
       setTimeout(setupWebSocket, 3000);
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error('WebSocket error in main.tsx:', error);
     };
   };
 

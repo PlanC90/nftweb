@@ -12,22 +12,22 @@ export const Home: React.FC = () => {
     const newSocket = new WebSocket('wss://nft.memextoken.org:24678/?token=4WBEmsv8B8Yf');
 
     newSocket.onopen = () => {
-      console.log('WebSocket connected');
+      console.log('WebSocket connected in Home.tsx');
       setMessage('WebSocket connected');
     };
 
     newSocket.onmessage = (event) => {
-      console.log('Message from server ', event.data);
+      console.log('Message from server in Home.tsx: ', event.data);
       setMessage(`Message from server: ${event.data}`);
     };
 
     newSocket.onclose = (event) => {
-      console.log('WebSocket disconnected', event.code, event.reason);
+      console.log('WebSocket disconnected in Home.tsx', event.code, event.reason);
       setMessage(`WebSocket disconnected: ${event.code} - ${event.reason}`);
     };
 
     newSocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error('WebSocket error in Home.tsx:', error);
       setMessage(`WebSocket error: ${error}`);
     };
 
