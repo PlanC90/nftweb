@@ -1,10 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NFTCard } from '../components/NFTCard';
 import { useStore } from '../store';
 import { Lightbulb, Gem, Code } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { nfts } = useStore();
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const newSocket = new WebSocket('wss://nft.memextoken.org:24678/?token=4WBEmsv8B8Yf');
+
+    newSocket.onopen = () => {
+      console.log('WebSocket connected');
+      setMessage('WebSocket connected');
+    };
+
+    newSocket.onmessage = (event) => {
+      console.log('Message from server ', event.data);
+      setMessage(`Message from server: ${event.data}`);
+    };
+
+    newSocket.onclose = () => {
+      console.log('WebSocket disconnected');
+      setMessage('WebSocket disconnected');
+    };
+
+    newSocket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setMessage(`WebSocket error: ${error}`);
+    };
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 py-12">
@@ -55,6 +87,9 @@ export const Home: React.FC = () => {
         </section>
 
         <h2 className="text-3xl font-bold text-white mb-8">Marketplace</h2>
+        <div>
+          <p className="text-white">{message}</p>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {nfts.map((nft) => (
             <NFTCard key={nft.id} nft={nft} />
