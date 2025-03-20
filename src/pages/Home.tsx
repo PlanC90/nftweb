@@ -6,6 +6,9 @@ import { Lightbulb, Gem, Code } from 'lucide-react';
 export const Home: React.FC = () => {
   const { nfts } = useStore();
 
+  // Debug log to check the nfts array
+  console.log('All NFTs:', nfts);
+
   return (
     <div className="min-h-screen bg-gray-900 py-12">
       {/* Boxed Container */}
@@ -55,7 +58,7 @@ export const Home: React.FC = () => {
         </section>
 
         <h2 className="text-3xl font-bold text-white mb-8">Marketplace</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {nfts.map((nft) => (
             <NFTCard key={nft.id} nft={nft} />
           ))}
