@@ -13,7 +13,7 @@ function Root() {
 
   // Function to establish WebSocket connection
   const setupWebSocket = () => {
-    const token = 'A-WR1onrC2rm';
+    const token = 'MV-Ti6JLHBFn';
     const wsUrl = `wss://nft.memextoken.org:24678/?token=${token}`; // Use wss
     const ws = new WebSocket(wsUrl);
 
@@ -33,6 +33,11 @@ function Root() {
 
     ws.onerror = (error) => {
       console.error('WebSocket error in main.tsx:', error);
+      if (error instanceof Event && error.type === 'error') {
+        console.error('WebSocket general error:', error);
+      } else {
+        console.error('WebSocket error:', error);
+      }
     };
   };
 
