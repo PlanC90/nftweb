@@ -8,17 +8,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/data': 'http://localhost:3000',
-      'wss://nft.memextoken.org:24678': {
-        target: 'wss://nft.memextoken.org:24678',
-        secure: true,
-        ws: true,
-      },
-      'ws://nft.memextoken.org:24678': {
-        target: 'wss://nft.memextoken.org:24678',
-        secure: true,
-        ws: true,
-      }
+      '/data': 'http://localhost:3000'
     },
     hmr: {
       overlay: false,
@@ -36,5 +26,6 @@ export default defineConfig({
         },
       },
     },
-    base: '/',
-  });
+  },
+  base: '/',
+});

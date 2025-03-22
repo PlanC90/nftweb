@@ -230,28 +230,6 @@
       "mintCount": 10,
       "soldCount": 0,
       "creator": "MemeX"
-    },
-    {
-      "id": "9a96480b-95a0-4e78-beb9-74443b305e5a",
-      "title": "test",
-      "description": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv\n\n",
-      "image": "https://coincodex.com/images/coincodex-light.svg?v=1",
-      "price": 1000000,
-      "priceXEP": 10000000,
-      "mintCount": 100,
-      "creator": "Admin",
-      "soldCount": 0
-    },
-    {
-      "id": "0b0e7912-2e63-4028-8b50-5079cf490a80",
-      "title": "test2",
-      "description": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv\n\n",
-      "image": "https://stackblitz.com/avatars/B/171.svg",
-      "price": 100000,
-      "priceXEP": 10,
-      "mintCount": 1000,
-      "creator": "Admin",
-      "soldCount": 1
     }
   ]
 }
