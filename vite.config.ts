@@ -9,18 +9,17 @@ import { defineConfig } from 'vite';
       server: {
         proxy: {
           '/data': {
-            target: 'http://localhost:3000',
-            secure: false, // set to true if your target is HTTPS
+            target: 'https://localhost:3000',
+            secure: true,
           },
-          '/socket.io': { // If you are using socket.io
-            target: 'ws://localhost:3000',
+          '/socket.io': {
+            target: 'wss://localhost:3000',
             ws: true,
-            secure: false, // set to true if your target is WSS
+            secure: true,
           }
         },
         hmr: {
           overlay: false,
-          protocol: 'ws',
         },
         allowedHosts: ["nft.memextoken.org"]
       },
