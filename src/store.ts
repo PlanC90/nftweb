@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { AdminState, NFT, Order, Settings } from './src/types';
-import nftData from '/data/nft.json';
-import ordersData from '/data/orders.json';
-import settingsData from '/data/settings.json';
+import nftData from '/public/data/nft.json';
+import ordersData from '/public/data/orders.json';
+import settingsData from '/public/data/settings.json';
 
 interface StoreState {
   nftList: NFT[];

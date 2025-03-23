@@ -23,6 +23,7 @@ export default defineConfig({
     },
     allowedHosts: ["nft.memextoken.org"]
   },
+  publicDir: 'public',
   build: {
     outDir: 'dist',
     sourcemap: false,
