@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { AdminState, NFT, Order, Settings } from './types';
-import nftData from '../public/data/nft.json' assert { type: "json" };
-import ordersData from '../public/data/orders.json' assert { type: "json" };
-import settingsData from '../public/data/settings.json' assert { type: "json" };
+import { AdminState, NFT, Order, Settings } from './src/types';
+import nftData from './public/data/nft.json';
+import ordersData from './public/data/orders.json';
+import settingsData from './public/data/settings.json';
 
 interface StoreState {
   nftList: NFT[];
@@ -19,6 +19,7 @@ interface StoreState {
   updateOrder: (updatedOrder: Order) => void;
   deleteOrder: (id: number) => void;
   updateSettings: (newSettings: Settings) => void;
+  connectWebSocket: () => void;
 }
 
 export const useStore = create<StoreState>((set, get) => ({
@@ -73,5 +74,45 @@ export const useStore = create<StoreState>((set, get) => ({
   },
   updateSettings: (newSettings) => {
     set({ settings: newSettings });
+  },
+  connectWebSocket: () => {
+    let ws: WebSocket | null = null;
+    const connect = () => {
+      const token = 'H_-D_3Q789Ru'; // Replace with your actual token retrieval logic
+      const wsUrl = `wss://nft.memextoken.org:24678/?token=${token}`;
+      console.log('Attempting to connect to WebSocket:', wsUrl);
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+      };
+
+      ws.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
+      };
+
+      ws.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        // Implement retry logic here
+        setTimeout(() => {
+          console.log('Attempting to reconnect WebSocket...');
+          connect();
+        }, 3000); // Retry after 3 seconds
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        ws?.close(); // Close the WebSocket on error to trigger the onclose event
+      };
+    };
+
+    connect();
+
+    // Return a cleanup function to close the WebSocket when the component unmounts
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
   },
 }));
