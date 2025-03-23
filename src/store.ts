@@ -73,7 +73,7 @@ const saveSettingsToFile = async (pendingBurn: number, burnedAmount: number, las
       body: JSON.stringify({
         admin: {
           username: 'PlanC',
-          password: 'Ceyhun8387@'
+          password: 'Memex2025@@'
         },
         burn: {
           pending: pendingBurn,
@@ -197,7 +197,7 @@ const useStore = create<StoreState>()(
       },
 
       updateOrder: async (orderId, updates) => {
-        set((state) => {
+        set(async (state) => {
           let updatedNFTs = [...state.nfts];
           let updatedOrders = state.orders.map((order) => {
             if (order.id === orderId) {
@@ -205,9 +205,12 @@ const useStore = create<StoreState>()(
               if (nft) {
                 // If the status is being updated to 'canceled', decrement the soldCount
                 if (updates.status === 'canceled' && order.status !== 'canceled') {
-                  updatedNFTs = state.nfts.map((n) =>
-                    n.id === order.nftId ? { ...n, soldCount: Math.max(0, n.soldCount - 1) } : n
-                  );
+                  updatedNFTs = updatedNFTs.map((n) => {
+                    if (n.id === order.nftId) {
+                      return { ...n, soldCount: Math.max(0, n.soldCount - 1) };
+                    }
+                    return n;
+                  });
                 }
               }
               return { ...order, ...updates };
@@ -215,8 +218,13 @@ const useStore = create<StoreState>()(
             return order;
           });
       
-          saveNFTsToFile(updatedNFTs);
-          saveOrdersToFile(updatedOrders);
+          try {
+            await saveNFTsToFile(updatedNFTs);
+            await saveOrdersToFile(updatedOrders);
+          } catch (error) {
+            console.error("Error saving data:", error);
+          }
+      
           return { nfts: updatedNFTs, orders: updatedOrders };
         });
       },
