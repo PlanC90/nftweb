@@ -583,8 +583,10 @@ const BurnManagement: React.FC = () => {
 
 const ExportImport: React.FC = () => {
   const { nfts, orders, addNFT, updateNFT, deleteNFT } = useStore();
+  const [selectedFileNFTs, setSelectedFileNFTs] = useState<File | null>(null);
+  const [selectedFileOrders, setSelectedFileOrders] = useState<File | null>(null);
 
-  const exportToExcel = (dataType: 'nfts' | 'orders') => {
+  const exportToJson = (dataType: 'nfts' | 'orders') => {
     let data: any[] = [];
     let fileName = '';
 
@@ -600,7 +602,7 @@ const ExportImport: React.FC = () => {
         soldCount: nft.soldCount,
         creator: nft.creator,
       }));
-      fileName = 'nfts.xlsx';
+      fileName = 'nfts.json';
     } else {
       data = orders.map((order) => ({
         id: order.id,
@@ -610,80 +612,84 @@ const ExportImport: React.FC = () => {
         purchaseDate: order.purchaseDate,
         status: order.status,
       }));
-      fileName = 'orders.xlsx';
+      fileName = 'orders.json';
     }
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, dataType);
-    XLSX.writeFile(wb, fileName);
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
-  const importFromExcel = (dataType: 'nfts' | 'orders', file: File) => {
+  const importFromJson = (dataType: 'nfts' | 'orders', file: File) => {
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
-      const binarystr = e.target.result;
-      const wb = XLSX.read(binarystr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const parsedData: any[] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      try {
+        const jsonData = JSON.parse(e.target.result);
 
-      // Assuming the first row is the header
-      const headers = parsedData[0] as string[];
-      const rows = parsedData.slice(1) as any[][];
+        if (dataType === 'nfts') {
+          jsonData.forEach((nftData: any) => {
+            const existingNFT = nfts.find((nft) => nft.id === nftData.id);
 
-      if (dataType === 'nfts') {
-        rows.forEach((row) => {
-          const nftData: any = {};
-          headers.forEach((header, index) => {
-            nftData[header] = row[index];
+            if (existingNFT) {
+              updateNFT(nftData.id, {
+                title: nftData.title,
+                description: nftData.description,
+                image: nftData.image,
+                price: Number(nftData.price),
+                priceXEP: Number(nftData.priceXEP),
+                mintCount: Number(nftData.mintCount),
+                soldCount: Number(nftData.soldCount),
+                creator: nftData.creator,
+              });
+            } else {
+              addNFT({
+                title: nftData.title,
+                description: nftData.description,
+                image: nftData.image,
+                price: Number(nftData.price),
+                priceXEP: Number(nftData.priceXEP),
+                mintCount: Number(nftData.mintCount),
+                soldCount: Number(nftData.soldCount),
+                creator: nftData.creator,
+              });
+            }
           });
-
-          // Check if NFT with the same ID already exists
-          const existingNFT = nfts.find((nft) => nft.id === nftData.id);
-
-          if (existingNFT) {
-            // Update existing NFT
-            updateNFT(nftData.id, {
-              title: nftData.title,
-              description: nftData.description,
-              image: nftData.image,
-              price: Number(nftData.price),
-              priceXEP: Number(nftData.priceXEP),
-              mintCount: Number(nftData.mintCount),
-              soldCount: Number(nftData.soldCount),
-              creator: nftData.creator,
-            });
-          } else {
-            // Add new NFT
-            addNFT({
-              title: nftData.title,
-              description: nftData.description,
-              image: nftData.image,
-              price: Number(nftData.price),
-              priceXEP: Number(nftData.priceXEP),
-              mintCount: Number(nftData.mintCount),
-              soldCount: Number(nftData.soldCount),
-              creator: nftData.creator,
-            });
-          }
-        });
-      } else {
-        // Handle orders import
-        // Similar logic as NFTs, but for orders
-        // You'll need to adjust this part based on your order structure
-        console.log('Importing orders:', parsedData);
+        } else {
+          console.log('Importing orders:', jsonData);
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        alert('Error parsing JSON file.');
       }
     };
 
-    reader.readAsBinaryString(file);
+    reader.readAsText(file);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, dataType: 'nfts' | 'orders') => {
     const file = e.target.files?.[0];
-    if (file) {
-      importFromExcel(dataType, file);
+    if (dataType === 'nfts') {
+      setSelectedFileNFTs(file || null);
+    } else {
+      setSelectedFileOrders(file || null);
+    }
+  };
+
+  const handleProcessImport = (dataType: 'nfts' | 'orders') => {
+    if (dataType === 'nfts' && selectedFileNFTs) {
+      importFromJson('nfts', selectedFileNFTs);
+    } else if (dataType === 'orders' && selectedFileOrders) {
+      importFromJson('orders', selectedFileOrders);
+    } else {
+      alert(`Please select a ${dataType === 'nfts' ? 'NFTs' : 'Orders'} file first.`);
     }
   };
 
@@ -693,36 +699,48 @@ const ExportImport: React.FC = () => {
       <div className="flex space-x-4 mb-4">
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-bold transition-colors"
-          onClick={() => exportToExcel('nfts')}
+          onClick={() => exportToJson('nfts')}
         >
-          Export NFTs to Excel
+          Export NFTs to JSON
         </button>
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-bold transition-colors"
-          onClick={() => exportToExcel('orders')}
+          onClick={() => exportToJson('orders')}
         >
-          Export Orders to Excel
+          Export Orders to JSON
         </button>
       </div>
 
       <div className="flex space-x-4">
         <div>
-          <label className="block text-gray-400 mb-2">Import NFTs from Excel</label>
+          <label className="block text-gray-400 mb-2">Import NFTs from JSON</label>
           <input
             type="file"
-            accept=".xlsx, .xls"
+            accept=".json"
             onChange={(e) => handleFileUpload(e, 'nfts')}
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
+          <button
+            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            onClick={() => handleProcessImport('nfts')}
+          >
+            Process NFTs Import
+          </button>
         </div>
         <div>
-          <label className="block text-gray-400 mb-2">Import Orders from Excel</label>
+          <label className="block text-gray-400 mb-2">Import Orders from JSON</label>
           <input
             type="file"
-            accept=".xlsx, .xls"
+            accept=".json"
             onChange={(e) => handleFileUpload(e, 'orders')}
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
+          <button
+            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            onClick={() => handleProcessImport('orders')}
+          >
+            Process Orders Import
+          </button>
         </div>
       </div>
     </div>
@@ -734,7 +752,7 @@ const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/planc" />;
   }
 
   return (
