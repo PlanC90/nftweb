@@ -35,14 +35,14 @@ export const Admin: React.FC = () => {
                 <th className="px-5 py-3 border-b-2 border-gray-700 bg-gray-900 text-left text-xs font-semibold text-white uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-5 py-3 border-b-2 border-gray-700 bg-gray-900 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                  Actions
-                </th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => {
                 const nft = nfts.find((nft) => nft.id === order.nftId);
+                if (order.status === 'cancelled' && nft) {
+                  return null;
+                }
                 return (
                   <tr key={order.id}>
                     <td className="px-5 py-5 border-b border-gray-700 bg-gray-800 text-sm">
@@ -59,9 +59,6 @@ export const Admin: React.FC = () => {
                     </td>
                     <td className="px-5 py-5 border-b border-gray-700 bg-gray-800 text-sm">
                       <p className="text-white">{order.purchaseDate}</p>
-                    </td>
-                    <td className="px-5 py-5 border-b border-gray-700 bg-gray-800 text-sm">
-                      <p className="text-white">{order.status}</p>
                     </td>
                     <td className="px-5 py-5 border-b border-gray-700 bg-gray-800 text-sm">
                       {order.status !== 'cancelled' && nft ? (
