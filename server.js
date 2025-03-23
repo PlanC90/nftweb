@@ -4,8 +4,6 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer as createViteServer } from 'vite';
-import { WebSocketServer } from 'ws';
-import { createServer } from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,15 +11,6 @@ const __dirname = dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// HTTPS Redirection Middleware
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'production' && req.header('x-forwarded-proto') !== 'https') {
-    res.redirect(`https://${req.hostname}${req.url}`);
-  } else {
-    next();
-  }
-});
 
 // File paths
 const DATA_DIR = join(__dirname, 'public', 'data');
@@ -44,7 +33,7 @@ const initializeFile = async (filePath, defaultContent) => {
 await initializeFile(NFT_FILE, { nfts: [] });
 await initializeFile(ORDERS_FILE, { orders: [] });
 await initializeFile(SETTINGS_FILE, {
-  admin: { username: 'PlanC', password: 'Memex8387@@' },
+  admin: { username: 'PlanC', password: 'Ceyhun8387@' },
   burn: { pending: 0, total: 0 }
 });
 
@@ -103,28 +92,6 @@ app.put('/data/settings.json', async (req, res) => {
   }
 });
 
-// Create HTTP server
-const server = createServer(app);
-
-// Create WebSocket server
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', ws => {
-  console.log('WebSocket connected');
-
-  ws.on('message', message => {
-    console.log('Received message:', message);
-  });
-
-  ws.on('close', () => {
-    console.log('WebSocket disconnected');
-  });
-
-  ws.on('error', error => {
-    console.error('WebSocket error:', error);
-  });
-});
-
 // Create Vite server in middleware mode
 const vite = await createViteServer({
   server: { middlewareMode: true },
@@ -146,6 +113,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -1,118 +1,288 @@
 import { create } from 'zustand';
-import { AdminState, NFT, Order, Settings } from './src/types';
-import nftData from '/public/data/nft.json';
-import ordersData from '/public/data/orders.json';
-import settingsData from '/public/data/settings.json';
+import { persist } from 'zustand/middleware';
+import { NFT, Order } from './types';
+import { v4 as uuidv4 } from 'uuid';
 
 interface StoreState {
-  nftList: NFT[];
+  nfts: NFT[];
   orders: Order[];
-  settings: Settings;
-  admin: AdminState;
   isAuthenticated: boolean;
+  pendingBurn: number;
+  burnedAmount: number;
+  lastOrderId: number;
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  addNft: (nft: NFT) => void;
-  updateNft: (updatedNft: NFT) => void;
-  deleteNft: (id: number) => void;
-  addOrder: (order: Order) => void;
-  updateOrder: (updatedOrder: Order) => void;
-  deleteOrder: (id: number) => void;
-  updateSettings: (newSettings: Settings) => void;
-  connectWebSocket: () => void;
+  addNFT: (nft: Omit<NFT, 'id' | 'soldCount'>) => void;
+  buyNFT: (nftId: string, quantity: number, customer: string, walletAddress: string) => void;
+  updateOrder: (orderId: string, updates: Partial<Order>) => void;
+  addOrder: (order: Omit<Order, 'id' | 'status'>) => void;
+  incrementSoldCount: (nftId: string) => void;
+  updateNFT: (nftId: string, updates: Partial<NFT>) => void;
+  deleteNFT: (nftId: string) => void;
+  updateAllNFTPrices: (newPrice: number) => void;
+  formatPrice: (price: number) => string;
+  updateBurnedAmount: (amount: number) => void;
+  updatePendingBurn: (amount: number) => void;
+  loadInitialData: () => Promise<void>;
 }
 
-export const useStore = create<StoreState>((set, get) => ({
-  nftList: nftData,
-  orders: ordersData,
-  settings: settingsData,
-  admin: {
-    username: settingsData.admin.username,
-    password: settingsData.admin.password,
-  },
-  isAuthenticated: false,
-  login: (username, password) => {
-    console.log('Attempting to login with:', username, password);
-    console.log('Stored credentials:', get().admin.username, get().admin.password);
-    if (username === get().admin.username && password === get().admin.password) {
-      set({ isAuthenticated: true });
-      return true;
-    } else {
-      return false;
+// Helper function to save NFTs to JSON file
+const saveNFTsToFile = async (nfts: NFT[]) => {
+  try {
+    const response = await fetch('/data/nft.json', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nfts }, null, 2),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save NFTs');
     }
-  },
-  logout: () => set({ isAuthenticated: false }),
-  addNft: (nft) => {
-    set((state) => ({ nftList: [...state.nftList, nft] }));
-  },
-  updateNft: (updatedNft) => {
-    set((state) => ({
-      nftList: state.nftList.map((nft) =>
-        nft.id === updatedNft.id ? updatedNft : nft
-      ),
-    }));
-  },
-  deleteNft: (id) => {
-    set((state) => ({
-      nftList: state.nftList.filter((nft) => nft.id !== id),
-    }));
-  },
-  addOrder: (order) => {
-    set((state) => ({ orders: [...state.orders, order] }));
-  },
-  updateOrder: (updatedOrder) => {
-    set((state) => ({
-      orders: state.orders.map((order) =>
-        order.id === updatedOrder.id ? updatedOrder : order
-      ),
-    }));
-  },
-  deleteOrder: (id) => {
-    set((state) => ({
-      orders: state.orders.filter((order) => order.id !== id),
-    }));
-  },
-  updateSettings: (newSettings) => {
-    set({ settings: newSettings });
-  },
-  connectWebSocket: () => {
-    let ws: WebSocket | null = null;
-    const connect = () => {
-      const token = 'H_-D_3Q789Ru'; // Replace with your actual token retrieval logic
-      const wsUrl = `wss://nft.memextoken.org:24678/?token=${token}`;
-      console.log('Attempting to connect to WebSocket:', wsUrl);
-      ws = new WebSocket(wsUrl);
+  } catch (error) {
+    console.error('Error saving NFTs:', error);
+  }
+};
 
-      ws.onopen = () => {
-        console.log('WebSocket connected');
-      };
+// Helper function to save orders to JSON file
+const saveOrdersToFile = async (orders: Order[]) => {
+  try {
+    const response = await fetch('/data/orders.json', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orders }, null, 2),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save orders');
+    }
+  } catch (error) {
+    console.error('Error saving orders:', error);
+  }
+};
 
-      ws.onmessage = (event) => {
-        console.log('WebSocket message received:', event.data);
-      };
+// Helper function to save settings to JSON file
+const saveSettingsToFile = async (pendingBurn: number, burnedAmount: number, lastOrderId: number) => {
+  try {
+    const response = await fetch('/data/settings.json', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        admin: {
+          username: 'PlanC',
+          password: 'Ceyhun8387@'
+        },
+        burn: {
+          pending: pendingBurn,
+          total: burnedAmount
+        },
+        lastOrderId: lastOrderId
+      }, null, 2),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save settings data');
+    }
+  } catch (error) {
+    console.error('Error saving settings data:', error);
+  }
+};
 
-      ws.onclose = (event) => {
-        console.log('WebSocket disconnected:', event.code, event.reason);
-        // Implement retry logic here
-        setTimeout(() => {
-          console.log('Attempting to reconnect WebSocket...');
-          connect();
-        }, 3000); // Retry after 3 seconds
-      };
+const useStore = create<StoreState>()(
+  persist(
+    (set, get) => ({
+      nfts: [],
+      orders: [],
+      isAuthenticated: false,
+      pendingBurn: 0,
+      burnedAmount: 0,
+      lastOrderId: 0,
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        ws?.close(); // Close the WebSocket on error to trigger the onclose event
-      };
-    };
+      loadInitialData: async () => {
+        try {
+          const [nftResponse, ordersResponse, settingsResponse] = await Promise.all([
+            fetch('/data/nft.json'),
+            fetch('/data/orders.json'),
+            fetch('/data/settings.json')
+          ]);
 
-    connect();
+          if (!nftResponse.ok || !ordersResponse.ok || !settingsResponse.ok) {
+            throw new Error('Failed to load data');
+          }
 
-    // Return a cleanup function to close the WebSocket when the component unmounts
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  },
-}));
+          const nftData = await nftResponse.json();
+          const ordersData = await ordersResponse.json();
+          const settingsData = await settingsResponse.json();
+
+          set({ 
+            nfts: nftData.nfts,
+            orders: ordersData.orders,
+            pendingBurn: settingsData.burn.pending,
+            burnedAmount: settingsData.burn.total,
+            lastOrderId: settingsData.lastOrderId || 0,
+          });
+        } catch (error) {
+          console.error('Error loading initial data:', error);
+        }
+      },
+
+      login: (username, password) => {
+        if (username === 'PlanC' && password === 'Ceyhun8387@') {
+          set({ isAuthenticated: true });
+          return true;
+        }
+        return false;
+      },
+
+      logout: () => set({ isAuthenticated: false }),
+
+      addNFT: async (nft) => {
+        const newNFT: NFT = {
+          id: uuidv4(),
+          ...nft,
+          soldCount: 0,
+        };
+        set((state) => {
+          const newNFTs = [...state.nfts, newNFT];
+          saveNFTsToFile(newNFTs);
+          return { nfts: newNFTs };
+        });
+      },
+
+      buyNFT: async (nftId: string, quantity: number, customer: string, walletAddress) => {
+        set((state) => {
+          const nft = state.nfts.find((nft) => nft.id === nftId);
+          if (!nft) {
+            console.log('NFT not found');
+            return state;
+          }
+
+          if (nft.mintCount <= nft.soldCount) {
+            console.log('NFT sold out');
+            return state;
+          }
+
+          const availableQuantity = Math.min(quantity, nft.mintCount - nft.soldCount);
+          const newOrderId = String(state.lastOrderId + 1).padStart(5, '0');
+
+          const newOrder: Order = {
+            id: newOrderId,
+            nftTitle: nft.title,
+            customer,
+            walletAddress,
+            purchaseDate: new Date().toLocaleDateString(),
+            status: 'pending payment',
+            nftId: nftId,
+          };
+
+          const updatedNFTs = state.nfts.map((n) =>
+            n.id === nftId ? { ...n, soldCount: n.soldCount + availableQuantity } : n
+          );
+
+          const updatedOrders = [...state.orders, newOrder];
+
+          // Save all changes to files
+          saveNFTsToFile(updatedNFTs);
+          saveOrdersToFile(updatedOrders);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, state.lastOrderId + 1);
+
+          return {
+            nfts: updatedNFTs,
+            orders: updatedOrders,
+            lastOrderId: state.lastOrderId + 1
+          };
+        });
+      },
+
+      updateOrder: async (orderId, updates) => {
+        set((state) => {
+          const updatedOrders = state.orders.map((order) => 
+            order.id === orderId ? { ...order, ...updates } : order
+          );
+          saveOrdersToFile(updatedOrders);
+          return { orders: updatedOrders };
+        });
+      },
+
+      addOrder: async (order) => {
+        set((state) => {
+          const newOrderId = String(state.lastOrderId + 1).padStart(5, '0');
+          const newOrder = { ...order, id: newOrderId, status: 'pending payment' };
+          const updatedOrders = [...state.orders, newOrder];
+          
+          saveOrdersToFile(updatedOrders);
+          saveSettingsToFile(state.pendingBurn, state.burnedAmount, state.lastOrderId + 1);
+          
+          return {
+            orders: updatedOrders,
+            lastOrderId: state.lastOrderId + 1
+          };
+        });
+      },
+
+      incrementSoldCount: async (nftId) => {
+        set((state) => {
+          const updatedNFTs = state.nfts.map((nft) =>
+            nft.id === nftId ? { ...nft, soldCount: nft.soldCount + 1 } : nft
+          );
+          saveNFTsToFile(updatedNFTs);
+          return { nfts: updatedNFTs };
+        });
+      },
+
+      updateNFT: async (nftId, updates) => {
+        set((state) => {
+          const updatedNFTs = state.nfts.map((nft) => 
+            nft.id === nftId ? { ...nft, ...updates } : nft
+          );
+          saveNFTsToFile(updatedNFTs);
+          return { nfts: updatedNFTs };
+        });
+      },
+
+      deleteNFT: async (nftId: string) => {
+        set((state) => {
+          const updatedNFTs = state.nfts.filter((nft) => nft.id !== nftId);
+          saveNFTsToFile(updatedNFTs);
+          return { nfts: updatedNFTs };
+        });
+      },
+
+      updateAllNFTPrices: async (newPrice: number) => {
+        set((state) => {
+          const updatedNFTs = state.nfts.map((nft) => ({ ...nft, price: newPrice }));
+          saveNFTsToFile(updatedNFTs);
+          return { nfts: updatedNFTs };
+        });
+      },
+
+      formatPrice: (price: number) => {
+        return price.toLocaleString('tr-TR');
+      },
+
+      updateBurnedAmount: (amount: number) => {
+        set((state) => {
+          const newBurnedAmount = amount;
+          saveSettingsToFile(state.pendingBurn, newBurnedAmount, get().lastOrderId);
+          return { burnedAmount: newBurnedAmount };
+        });
+      },
+
+      updatePendingBurn: (amount: number) => {
+        set((state) => {
+          const newPendingBurn = state.pendingBurn + amount;
+          saveSettingsToFile(newPendingBurn, state.burnedAmount, get().lastOrderId);
+          return { pendingBurn: newPendingBurn };
+        });
+      },
+    }),
+    {
+      name: 'nft-storage',
+      storage: localStorage,
+    }
+  )
+);
+
+export { useStore };
