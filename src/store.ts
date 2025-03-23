@@ -15,6 +15,7 @@ interface StoreState {
   incrementSoldCount: (nftId: string) => void;
   remintNFT: (nftId: string) => void;
   formatPrice: (price: number) => string;
+  loadInitialData: () => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -54,6 +55,10 @@ export const useStore = create<StoreState>()(
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
+      },
+      loadInitialData: () => {
+        // This function can be used to load initial data if needed
+        console.log('loadInitialData called');
       },
     }),
     {
