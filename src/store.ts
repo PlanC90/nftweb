@@ -198,11 +198,26 @@ const useStore = create<StoreState>()(
 
       updateOrder: async (orderId, updates) => {
         set((state) => {
-          const updatedOrders = state.orders.map((order) => 
-            order.id === orderId ? { ...order, ...updates } : order
-          );
+          let updatedNFTs = [...state.nfts];
+          let updatedOrders = state.orders.map((order) => {
+            if (order.id === orderId) {
+              const nft = state.nfts.find((nft) => nft.id === order.nftId);
+              if (nft) {
+                // If the status is being updated to 'canceled', decrement the soldCount
+                if (updates.status === 'canceled' && order.status !== 'canceled') {
+                  updatedNFTs = state.nfts.map((n) =>
+                    n.id === order.nftId ? { ...n, soldCount: Math.max(0, n.soldCount - 1) } : n
+                  );
+                }
+              }
+              return { ...order, ...updates };
+            }
+            return order;
+          });
+      
+          saveNFTsToFile(updatedNFTs);
           saveOrdersToFile(updatedOrders);
-          return { orders: updatedOrders };
+          return { nfts: updatedNFTs, orders: updatedOrders };
         });
       },
 
