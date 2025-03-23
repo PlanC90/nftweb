@@ -582,7 +582,7 @@ const BurnManagement: React.FC = () => {
 };
 
 const ExportImport: React.FC = () => {
-  const { nfts, orders, addNFT, updateNFT, deleteNFT } = useStore();
+  const { nfts, orders, addNFT, updateNFT, deleteNFT, addOrder, updateOrder } = useStore();
   const [selectedNFTFile, setSelectedNFTFile] = useState<File | null>(null);
   const [selectedOrderFile, setSelectedOrderFile] = useState<File | null>(null);
 
@@ -772,32 +772,30 @@ const ExportImport: React.FC = () => {
             if (jsonData && Array.isArray(jsonData.orders)) {
               // Update the orders in the store
               jsonData.orders.forEach((orderData: any) => {
-                // Check if order with the same ID already exists
-                // const existingOrder = orders.find((order) => order.id === orderData.id);
+                const existingOrder = orders.find((order) => order.id === orderData.id);
 
-                // if (existingOrder) {
-                //   // Update existing order
-                //   updateOrder(orderData.id, {
-                //     nftTitle: orderData.nftTitle,
-                //     customer: orderData.customer,
-                //     walletAddress: orderData.walletAddress,
-                //     purchaseDate: orderData.purchaseDate,
-                //     status: orderData.status,
-                //   });
-                // } else {
+                if (existingOrder) {
+                  // Update existing order
+                  updateOrder(orderData.id, {
+                    nftTitle: orderData.nftTitle,
+                    customer: orderData.customer,
+                    walletAddress: orderData.walletAddress,
+                    purchaseDate: orderData.purchaseDate,
+                    status: orderData.status,
+                  });
+                } else {
                   // Add new order
-                  // You'll need to implement the addOrder function in your store
-                  // addOrder({
-                  //   nftTitle: orderData.nftTitle,
-                  //   customer: orderData.customer,
-                  //   walletAddress: orderData.walletAddress,
-                  //   purchaseDate: orderData.purchaseDate,
-                  //   status: orderData.status,
-                  // });
-                  console.log('Order Data:', orderData);
-                // }
+                  addOrder({
+                    id: orderData.id,
+                    nftTitle: orderData.nftTitle,
+                    customer: orderData.customer,
+                    walletAddress: orderData.walletAddress,
+                    purchaseDate: orderData.purchaseDate,
+                    status: orderData.status,
+                  });
+                }
               });
-              alert('Orders imported successfully! (Note: Implementation to update/add orders is required.)');
+              alert('Orders imported successfully!');
             } else {
               alert('Invalid Orders data format.');
             }
