@@ -10,6 +10,10 @@ export const Login: React.FC = () => {
   const { login, isAuthenticated } = useStore();
   const navigate = useNavigate();
 
+  if (isAuthenticated) {
+    return <Navigate to="/admin" />;
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (login(username, password)) {

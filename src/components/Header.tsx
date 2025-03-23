@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
               </button>
             </>
           ) : (
-            null
+            <></>
           )}
         </nav>
       </div>
