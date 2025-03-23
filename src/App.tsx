@@ -18,7 +18,7 @@ function App() {
             <main className="py-8">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/planc" element={<Login />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/purchase/:id" element={<Purchase />} />
               </Routes>
