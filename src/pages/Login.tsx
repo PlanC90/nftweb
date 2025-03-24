@@ -11,7 +11,7 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    return <Navigate to="/admin" />;
+    return <Navigate to="/planc" />;
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ export const Login: React.FC = () => {
         localStorage.removeItem('rememberMe');
         localStorage.removeItem('username');
       }
-      navigate('/admin');
+      navigate('/planc');
     } else {
       setError('Invalid credentials');
     }
