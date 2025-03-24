@@ -85,7 +85,8 @@ app.put('/data/orders.json', async (req, res) => {
 
 app.put('/data/settings.json', async (req, res) => {
   try {
-    await fs.writeFile(SETTINGS_FILE, JSON.stringify(req.body, null, 2));
+    const settings = JSON.stringify(req.body, null, 2);
+    await fs.writeFile(SETTINGS_FILE, settings);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to write settings data' });

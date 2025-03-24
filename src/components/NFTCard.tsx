@@ -17,7 +17,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
 
   return (
     <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden relative transform transition-transform hover:scale-105 hover:shadow-lg flex flex-col">
-      <Link to={`/purchase/${nft.id}`} className="block">
+      <Link to={`/purchase/${nft.id}`} className="block" onClick={handleClick}>
         <div className="relative">
           <img
             src={nft.image}

@@ -671,7 +671,7 @@ const ExportImport: React.FC = () => {
         });
       } else {
         // Handle orders import
-        // Similar logic as NFTs, but for orders
+        // Similar logic asNFTs, but for orders
         // You'll need to adjust this part based on your order structure
         console.log('Importing orders:', parsedData);
       }

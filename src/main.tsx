@@ -39,7 +39,7 @@ function Root() {
   useEffect(() => {
     loadInitialData();
     setupWebSocket(); // Call WebSocket setup
-  }, [loadInitialData]);
+  }, []);
 
   return <App />;
 }
