@@ -7,7 +7,6 @@ import { Purchase } from './pages/Purchase';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import { Navigate } from 'react-router-dom';
 
 function App() {
   return (
@@ -19,9 +18,7 @@ function App() {
             <main className="py-8">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Navigate to="/planc" />} />
-                <Route path="/admin" element={<Navigate to="/planc" />} />
-                <Route path="/yonetim" element={<Navigate to="/planc" />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/planc" element={<Admin />} />
                 <Route path="/purchase/:id" element={<Purchase />} />
               </Routes>
