@@ -646,43 +646,32 @@ const ExportImport: React.FC = () => {
       const totalRows = rows.length;
 
       if (dataType === 'nfts') {
+        // First, delete all existing NFTs
+        nfts.forEach((nft) => deleteNFT(nft.id));
+
         rows.forEach((row, index) => {
           const nftData: any = {};
           headers.forEach((header, index) => {
             nftData[header] = row[index];
           });
 
-          // Check if NFT with the same ID already exists
-          const existingNFT = nfts.find((nft) => nft.id === nftData.id);
+          // Add new NFT
+          addNFT({
+            title: nftData.title,
+            description: nftData.description,
+            image: nftData.image,
+            price: Number(nftData.price),
+            priceXEP: Number(nftData.priceXEP),
+            mintCount: Number(nftData.mintCount),
+            soldCount: Number(nftData.soldCount),
+            creator: nftData.creator,
+          });
 
-          if (existingNFT) {
-            // Update existing NFT
-            updateNFT(nftData.id, {
-              title: nftData.title,
-              description: nftData.description,
-              image: nftData.image,
-              price: Number(nftData.price),
-              priceXEP: Number(nftData.priceXEP),
-              mintCount: Number(nftData.mintCount),
-              soldCount: Number(nftData.soldCount),
-              creator: nftData.creator,
-            });
-          } else {
-            // Add new NFT
-            addNFT({
-              title: nftData.title,
-              description: nftData.description,
-              image: nftData.image,
-              price: Number(nftData.price),
-              priceXEP: Number(nftData.priceXEP),
-              mintCount: Number(nftData.mintCount),
-              soldCount: Number(nftData.soldCount),
-              creator: nftData.creator,
-            });
-          }
           const progress = Math.round(((index + 1) / totalRows) * 100);
           setImportProgress(progress);
         });
+        setImportProgress(100); // Ensure progress reaches 100%
+        setIsImporting(false);
       } else {
         // Handle orders import
         // Similar logic asNFTs, but for orders
@@ -690,7 +679,6 @@ const ExportImport: React.FC = () => {
         console.log('Importing orders:', parsedData);
       }
       setIsImporting(false);
-      setImportProgress(0);
     };
 
     reader.readAsBinaryString(file);
