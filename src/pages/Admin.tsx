@@ -399,7 +399,7 @@ const NFTOrders: React.FC = () => {
                     </button>
                   ) : (
                     <button
-                      onClick={() => handleEditOrder(order.id)}
+                      onClick={()={() => handleEditOrder(order.id)}
                       className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-bold transition-colors"
                     >
                       Edit
@@ -585,6 +585,8 @@ const ExportImport: React.FC = () => {
   const { nfts, orders, addNFT, updateNFT, deleteNFT } = useStore();
   const [selectedNftsFile, setSelectedNftsFile] = useState<File | null>(null);
   const [selectedOrdersFile, setSelectedOrdersFile] = useState<File | null>(null);
+  const [nftsFile, setNftsFile] = useState<File | null>(null);
+  const [ordersFile, setOrdersFile] = useState<File | null>(null);
 
   const exportToExcel = (dataType: 'nfts' | 'orders') => {
     let data: any[] = [];
@@ -690,8 +692,10 @@ const ExportImport: React.FC = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, dataType: 'nfts' | 'orders') => {
     const file = e.target.files?.[0];
     if (dataType === 'nfts') {
+      setNftsFile(file);
       setSelectedNftsFile(file);
     } else {
+      setOrdersFile(file);
       setSelectedOrdersFile(file);
     }
   };
@@ -732,7 +736,7 @@ const ExportImport: React.FC = () => {
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
           <button
-            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            className="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
             onClick={() => handleImport('nfts')}
           >
             Import NFTs
@@ -747,7 +751,7 @@ const ExportImport: React.FC = () => {
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
           <button
-            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            className="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
             onClick={() => handleImport('orders')}
           >
             Import Orders
@@ -767,8 +771,7 @@ const Admin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12">
-      <div className="container mx-auto px-6 max-w-6xl">
+    <div className="min-h-screen bg-gray-900 py      <div className="container mx-auto px-6 max-w-6xl">
         <h2 className="text-3xl font-bold text-white mb-8">Admin Panel</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
