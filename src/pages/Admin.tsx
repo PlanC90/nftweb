@@ -583,6 +583,8 @@ const BurnManagement: React.FC = () => {
 
 const ExportImport: React.FC = () => {
   const { nfts, orders, addNFT, updateNFT, deleteNFT } = useStore();
+  const [selectedNftsFile, setSelectedNftsFile] = useState<File | null>(null);
+  const [selectedOrdersFile, setSelectedOrdersFile] = useState<File | null>(null);
 
   const exportToExcel = (dataType: 'nfts' | 'orders') => {
     let data: any[] = [];
@@ -619,7 +621,12 @@ const ExportImport: React.FC = () => {
     XLSX.writeFile(wb, fileName);
   };
 
-  const importFromExcel = (dataType: 'nfts' | 'orders', file: File) => {
+  const importFromExcel = (dataType: 'nfts' | 'orders', file: File | null) => {
+    if (!file) {
+      alert(`Please select a file to import ${dataType === 'nfts' ? 'NFTs' : 'Orders'}.`);
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
@@ -682,8 +689,18 @@ const ExportImport: React.FC = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, dataType: 'nfts' | 'orders') => {
     const file = e.target.files?.[0];
-    if (file) {
-      importFromExcel(dataType, file);
+    if (dataType === 'nfts') {
+      setSelectedNftsFile(file);
+    } else {
+      setSelectedOrdersFile(file);
+    }
+  };
+
+  const handleImport = (dataType: 'nfts' | 'orders') => {
+    if (dataType === 'nfts') {
+      importFromExcel('nfts', selectedNftsFile);
+    } else {
+      importFromExcel('orders', selectedOrdersFile);
     }
   };
 
@@ -714,6 +731,12 @@ const ExportImport: React.FC = () => {
             onChange={(e) => handleFileUpload(e, 'nfts')}
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
+          <button
+            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            onClick={() => handleImport('nfts')}
+          >
+            Import NFTs
+          </button>
         </div>
         <div>
           <label className="block text-gray-400 mb-2">Import Orders from Excel</label>
@@ -723,6 +746,12 @@ const ExportImport: React.FC = () => {
             onChange={(e) => handleFileUpload(e, 'orders')}
             className="bg-gray-700 text-white p-2 rounded-lg"
           />
+          <button
+            className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
+            onClick={() => handleImport('orders')}
+          >
+            Import Orders
+          </button>
         </div>
       </div>
     </div>
@@ -748,7 +777,7 @@ const Admin: React.FC = () => {
             <p className="text-2xl font-bold text-white">{pendingBurn.toLocaleString('tr-TR')}</p>
           </div>
           <div className="bg-gray-800 rounded-xl p-6 shadow-md">
-            <h4 className="text-gray-400 text-sm">MemeX Burned</h4>
+            <h4 className="textt-gray-400 text-sm">MemeX Burned</h4>
             <p className="text-2xl font-bold text-white">{burnedAmount.toLocaleString('tr-TR')}</p>
           </div>
         </div>

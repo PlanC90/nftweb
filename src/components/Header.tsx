@@ -36,7 +36,12 @@ export const Header: React.FC = () => {
               </button>
             </>
           ) : (
-            <></>
+            <Link
+              to="/login"
+              className="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg transition-colors"
+            >
+              Login
+            </Link>
           )}
         </nav>
       </div>
