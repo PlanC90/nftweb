@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
           {isAuthenticated ? (
             <>
               <Link
-                to="/admin"
+                to="/planc"
                 className="bg-[rgb(17 24 39)] hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors"
               >
                 Admin Panel
