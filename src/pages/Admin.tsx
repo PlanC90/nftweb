@@ -399,7 +399,7 @@ const NFTOrders: React.FC = () => {
                     </button>
                   ) : (
                     <button
-                      onClick={()={() => handleEditOrder(order.id)}
+                      onClick={() => handleEditOrder(order.id)}
                       className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-bold transition-colors"
                     >
                       Edit
@@ -702,9 +702,9 @@ const ExportImport: React.FC = () => {
 
   const handleImport = (dataType: 'nfts' | 'orders') => {
     if (dataType === 'nfts') {
-      importFromExcel('nfts', selectedNftsFile);
+      importFromExcel('nfts', nftsFile);
     } else {
-      importFromExcel('orders', selectedOrdersFile);
+      importFromExcel('orders', ordersFile);
     }
   };
 
@@ -771,7 +771,8 @@ const Admin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 py      <div className="container mx-auto px-6 max-w-6xl">
+    <div className="min-h-screen bg-gray-900 py-6">
+      <div className="container mx-auto px-6 max-w-6xl">
         <h2 className="text-3xl font-bold text-white mb-8">Admin Panel</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -780,7 +781,7 @@ const Admin: React.FC = () => {
             <p className="text-2xl font-bold text-white">{pendingBurn.toLocaleString('tr-TR')}</p>
           </div>
           <div className="bg-gray-800 rounded-xl p-6 shadow-md">
-            <h4 className="textt-gray-400 text-sm">MemeX Burned</h4>
+            <h4 className="text-gray-400 text-sm">MemeX Burned</h4>
             <p className="text-2xl font-bold text-white">{burnedAmount.toLocaleString('tr-TR')}</p>
           </div>
         </div>
