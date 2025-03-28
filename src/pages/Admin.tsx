@@ -587,6 +587,8 @@ const ExportImport: React.FC = () => {
   const [selectedOrdersFile, setSelectedOrdersFile] = useState<File | null>(null);
   const [nftsFile, setNftsFile] = useState<File | null>(null);
   const [ordersFile, setOrdersFile] = useState<File | null>(null);
+  const [importProgress, setImportProgress] = useState<number>(0);
+  const [isImporting, setIsImporting] = useState<boolean>(false);
 
   const exportToExcel = (dataType: 'nfts' | 'orders') => {
     let data: any[] = [];
@@ -641,9 +643,10 @@ const ExportImport: React.FC = () => {
       // Assuming the first row is the header
       const headers = parsedData[0] as string[];
       const rows = parsedData.slice(1) as any[][];
+      const totalRows = rows.length;
 
       if (dataType === 'nfts') {
-        rows.forEach((row) => {
+        rows.forEach((row, index) => {
           const nftData: any = {};
           headers.forEach((header, index) => {
             nftData[header] = row[index];
@@ -677,6 +680,8 @@ const ExportImport: React.FC = () => {
               creator: nftData.creator,
             });
           }
+          const progress = Math.round(((index + 1) / totalRows) * 100);
+          setImportProgress(progress);
         });
       } else {
         // Handle orders import
@@ -684,6 +689,8 @@ const ExportImport: React.FC = () => {
         // You'll need to adjust this part based on your order structure
         console.log('Importing orders:', parsedData);
       }
+      setIsImporting(false);
+      setImportProgress(0);
     };
 
     reader.readAsBinaryString(file);
@@ -701,6 +708,8 @@ const ExportImport: React.FC = () => {
   };
 
   const handleImport = (dataType: 'nfts' | 'orders') => {
+    setIsImporting(true);
+    setImportProgress(0);
     if (dataType === 'nfts') {
       importFromExcel('nfts', nftsFile);
     } else {
@@ -738,6 +747,7 @@ const ExportImport: React.FC = () => {
           <button
             className="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
             onClick={() => handleImport('nfts')}
+            disabled={isImporting}
           >
             Import NFTs
           </button>
@@ -753,16 +763,23 @@ const ExportImport: React.FC = () => {
           <button
             className="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded-lg font-bold transition-colors mt-2"
             onClick={() => handleImport('orders')}
+            disabled={isImporting}
           >
             Import Orders
           </button>
         </div>
       </div>
+      {isImporting && (
+        <div className="mt-4">
+          <p className="text-white">Importing... {importProgress}%</p>
+          <progress value={importProgress} max="100" className="w-full"></progress>
+        </div>
+      )}
     </div>
   );
 };
 
-const Admin: React.FC = () => {
+const Admin:React.FC = () => {
   const { isAuthenticated, pendingBurn, burnedAmount } = useStore();
   const [activeTab, setActiveTab] = useState('dashboard');
 
