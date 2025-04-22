@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { NFT, Order } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from './supabaseClient';
+import { NFT, Order } from './types';
 
 interface StoreState {
   nfts: NFT[];
@@ -10,128 +11,118 @@ interface StoreState {
   isAuthenticated: boolean;
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  addNFT: (nft: Omit<NFT, 'id' | 'soldCount'>) => void;
-  updateNFT: (id: string, updates: Partial<NFT>) => void;
-  deleteNFT: (id: string) => void;
-  addOrder: (order: Omit<Order, 'id'>) => void;
-  updateOrder: (id: string, updates: Partial<Order>) => void;
+  addNFT: (nft: Omit<NFT, 'id' | 'soldCount'>) => Promise<void>;
+  updateNFT: (id: string, updates: Partial<NFT>) => Promise<void>;
+  deleteNFT: (id: string) => Promise<void>;
+  addOrder: (order: Omit<Order, 'id'>) => Promise<void>;
+  updateOrder: (id: string, updates: Partial<Order>) => Promise<void>;
   updatePendingBurn: (amount: number) => void;
   updateBurnedAmount: (amount: number) => void;
   loadInitialData: () => Promise<void>;
-  saveData: () => Promise<void>;
   formatPrice: (price: number) => string;
 }
 
-export const useStore = create<StoreState>((set, get) => ({
+export const useStore = create<StoreState>((set) => ({
   nfts: [],
   orders: [],
   pendingBurn: 0,
   burnedAmount: 0,
   isAuthenticated: false,
+
   login: (username, password) => {
-    // Basic authentication check
     if (username === 'PlanC' && password === 'Ceyhun8387@') {
       set({ isAuthenticated: true });
       return true;
     }
     return false;
   },
+
   logout: () => set({ isAuthenticated: false }),
-  addNFT: (nft) => {
+
+  addNFT: async (nft) => {
     const newNFT: NFT = { id: uuidv4(), soldCount: 0, ...nft };
+    const { error } = await supabase.from('nfts').insert([newNFT]);
+    if (error) return console.error('❌ NFT eklenemedi:', error.message);
     set((state) => ({ nfts: [...state.nfts, newNFT] }));
-    // After updating state
-    useStore.getState().saveData();
   },
-  updateNFT: (id, updates) => {
+
+  updateNFT: async (id, updates) => {
+    const { error } = await supabase.from('nfts').update(updates).eq('id', id);
+    if (error) return console.error('❌ NFT güncellenemedi:', error.message);
     set((state) => ({
       nfts: state.nfts.map((nft) => (nft.id === id ? { ...nft, ...updates } : nft)),
     }));
-    // After updating state
-    useStore.getState().saveData();
   },
-  deleteNFT: (id) => {
+
+  deleteNFT: async (id) => {
+    const { error } = await supabase.from('nfts').delete().eq('id', id);
+    if (error) return console.error('❌ NFT silinemedi:', error.message);
     set((state) => ({ nfts: state.nfts.filter((nft) => nft.id !== id) }));
-    useStore.getState().saveData();
   },
-  addOrder: (order) => {
+
+  addOrder: async (order) => {
     const newOrder: Order = { id: uuidv4(), ...order };
-    set((state) => ({ orders: [...state.orders, newOrder] }));
-    useStore.getState().saveData();
+    const nftId = order.nftId;
+
+    const { data: nft } = await supabase
+        .from('nfts')
+        .select('soldCount, mintCount')
+        .eq('id', nftId)
+        .single();
+
+    if (!nft) return console.error('❌ NFT bulunamadı');
+    if (nft.soldCount >= nft.mintCount) {
+      alert("❌ This NFT is sold out!");
+      return;
+    }
+
+    const { error: orderError } = await supabase.from('orders').insert([newOrder]);
+    if (orderError) return console.error('❌ Order eklenemedi:', orderError.message);
+
+    const updatedCount = nft.soldCount + 1;
+    const { error: nftError } = await supabase.from('nfts').update({ soldCount: updatedCount }).eq('id', nftId);
+    if (nftError) return console.error('❌ soldCount güncellenemedi:', nftError.message);
+
+    set((state) => ({
+      orders: [...state.orders, newOrder],
+      nfts: state.nfts.map((nft) =>
+          nft.id === nftId ? { ...nft, soldCount: updatedCount } : nft
+      ),
+    }));
   },
-  updateOrder: (id, updates) => {
+
+  updateOrder: async (id, updates) => {
+    const { error } = await supabase.from('orders').update(updates).eq('id', id);
+    if (error) return console.error('❌ Order güncellenemedi:', error.message);
     set((state) => ({
       orders: state.orders.map((order) => (order.id === id ? { ...order, ...updates } : order)),
     }));
-    useStore.getState().saveData();
   },
+
   updatePendingBurn: (amount) => {
     set((state) => ({ pendingBurn: state.pendingBurn + amount }));
-    useStore.getState().saveData();
   },
+
   updateBurnedAmount: (amount) => {
     set({ burnedAmount: amount });
-    useStore.getState().saveData();
   },
+
   loadInitialData: async () => {
     try {
-      const [nftResponse, ordersResponse, settingsResponse] = await Promise.all([
-        fetch('/data/nft.json'),
-        fetch('/data/orders.json'),
-        fetch('/data/settings.json'),
-      ]);
-
-      const nftData = await nftResponse.json();
-      const ordersData = await ordersResponse.json();
-      const settingsData = await settingsResponse.json();
+      const { data: nftData } = await supabase.from('nfts').select('*');
+      const { data: orderData } = await supabase.from('orders').select('*');
 
       set({
-        nfts: nftData.nfts || [],
-        orders: ordersData.orders || [],
-        pendingBurn: settingsData.burn?.pending || 0,
-        burnedAmount: settingsData.burn?.total || 0,
+        nfts: nftData || [],
+        orders: orderData || [],
+        pendingBurn: 0,
+        burnedAmount: 0,
       });
     } catch (error) {
-      console.error('Failed to initialize data:', error);
+      console.error('❌ Veriler alınamadı:', error);
     }
   },
-  saveData: async () => {
-    try {
-      const nfts = get().nfts;
-      const orders = get().orders;
-      const pendingBurn = get().pendingBurn;
-      const burnedAmount = get().burnedAmount;
 
-      // Save NFTs
-      await fetch('/data/nft.json', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nfts }),
-      });
-
-      // Save orders
-      await fetch('/data/orders.json', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ orders }),
-      });
-
-      // Save settings (burn data)
-      await fetch('/data/settings.json', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ burn: { pending: pendingBurn, total: burnedAmount } }),
-      });
-    } catch (error) {
-      console.error('Failed to save data:', error);
-    }
-  },
   formatPrice: (price: number) => {
     return price.toLocaleString(undefined, {
       minimumFractionDigits: 2,

@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../store';
 
 export const Header: React.FC = () => {
   const { isAuthenticated, logout } = useStore();
+  const [hideAdminLogin, setHideAdminLogin] = useState(false);
+
+  useEffect(() => {
+    fetch('/data/settings.json')
+      .then((response) => response.json())
+      .then((data) => {
+        setHideAdminLogin(data.hideAdminLogin || false);
+      })
+      .catch((error) => {
+        console.error('Error fetching settings:', error);
+      });
+  }, []);
 
   return (
     <header className="bg-gray-900 text-white py-4 px-6">
@@ -36,7 +48,14 @@ export const Header: React.FC = () => {
               </button>
             </>
           ) : (
-            <></>
+            !hideAdminLogin && (
+              <Link
+                to="/login"
+                className="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg transition-colors"
+              >
+                Admin Login
+              </Link>
+            )
           )}
         </nav>
       </div>
