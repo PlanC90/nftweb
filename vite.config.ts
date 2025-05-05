@@ -9,6 +9,12 @@ export default defineConfig({
   server: {
     proxy: {
       '/data': 'http://localhost:3000',
+      '/socket.io': {
+        target: 'wss://nft.memextoken.org:24678',
+        ws: true,
+        secure: true,
+        changeOrigin: true
+      },
       'wss://nft.memextoken.org:24678': {
         target: 'wss://nft.memextoken.org:24678',
         secure: true,
