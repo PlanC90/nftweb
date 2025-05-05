@@ -30,7 +30,7 @@ export default defineConfig({
     },
     hmr: {
       overlay: false,
-      protocol: 'ws',
+      protocol: 'wss',
     },
     allowedHosts: ["nft.memextoken.org"],
     https: true,

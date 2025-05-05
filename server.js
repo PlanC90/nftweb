@@ -5,7 +5,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer as createViteServer } from 'vite';
 import { WebSocketServer } from 'ws';
-import { createServer } from 'http';
+import { createServer as createHttpServer } from 'http';
+import { readFileSync } from 'fs';
+import https from 'https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -96,34 +98,48 @@ app.put('/data/settings.json', async (req, res) => {
 });
 
 // Create HTTP server
-const server = createServer(app);
+const httpServer = createHttpServer(app);
+
+// Read certificates
+let httpsServer;
+try {
+  const privateKey = readFileSync('/home/project/privkey.pem', 'utf8');
+  const certificate = readFileSync('/home/project/fullchain.pem', 'utf8');
+
+  // Create HTTPS server options
+  const httpsOptions = {
+    key: privateKey,
+    cert: certificate,
+  };
+
+  // Create HTTPS server
+  httpsServer = https.createServer(httpsOptions, app);
+} catch (error) {
+  console.warn("HTTPS configuration failed. Starting HTTP server only.", error);
+}
 
 // Create WebSocket server
-const wss = new WebSocketServer({ noServer: true });
+let wss;
+if (httpsServer) {
+  wss = new WebSocketServer({ server: httpsServer });
 
-wss.on('connection', ws => {
-  console.log('WebSocket connected on server.js');
+  wss.on('connection', ws => {
+    console.log('WebSocket connected on server.js');
 
-  ws.on('message', message => {
-    console.log('Received on server.js:', message.toString());
-    ws.send(`Server received: ${message}`);
+    ws.on('message', message => {
+      console.log('Received on server.js:', message.toString());
+      ws.send(`Server received: ${message}`);
+    });
+
+    ws.on('close', () => {
+      console.log('WebSocket disconnected on server.js');
+    });
+
+    ws.on('error', error => {
+      console.error('WebSocket error on server.js:', error);
+    });
   });
-
-  ws.on('close', () => {
-    console.log('WebSocket disconnected on server.js');
-  });
-
-  ws.on('error', error => {
-    console.error('WebSocket error on server.js:', error);
-  });
-});
-
-// Upgrade HTTP server connection to WebSocket
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, ws => {
-    wss.emit('connection', ws, request);
-  });
-});
+}
 
 // Create Vite server in middleware mode
 const vite = await createViteServer({
@@ -144,8 +160,16 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Start server
+// Start the HTTPS server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+if (httpsServer) {
+  httpsServer.listen(PORT, () => {
+    console.log(`HTTPS server running on https://localhost:${PORT}`);
+  });
+}
+
+// Start the HTTP server
+const HTTP_PORT = 3001;
+httpServer.listen(HTTP_PORT, () => {
+  console.log(`HTTP server running on http://localhost:${HTTP_PORT}`);
 });
