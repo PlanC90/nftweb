@@ -7,7 +7,7 @@
       "walletAddress": "x2025",
       "purchaseDate": "16.03.2025",
       "nftId": "20",
-      "status": "shipped"
+      "status": "cancelled"
     },
     {
       "id": "00003",
@@ -25,7 +25,7 @@
       "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
       "purchaseDate": "16.03.2025",
       "nftId": "2",
-      "status": "shipped"
+      "status": "cancelled"
     },
     {
       "id": "00005",
@@ -34,15 +34,24 @@
       "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
       "purchaseDate": "16.03.2025",
       "nftId": "1",
-      "status": "shipped"
+      "status": "cancelled"
     },
     {
       "id": "00006",
-      "nftTitle": "MemeX NFT #21",
+      "nftTitle": "MemeX NFT #11",
       "customer": "Customer Name",
       "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
       "purchaseDate": "16.03.2025",
-      "nftId": "21",
+      "nftId": "11",
+      "status": "cancelled"
+    },
+    {
+      "id": "00007",
+      "nftTitle": "test2",
+      "customer": "Customer Name",
+      "walletAddress": "x8SZrSMmxZk4PHdQX3yt3mheYUrzfMvZzv",
+      "purchaseDate": "16.03.2025",
+      "nftId": "0b0e7912-2e63-4028-8b50-5079cf490a80",
       "status": "pending payment"
     }
   ]
