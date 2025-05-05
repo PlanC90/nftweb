@@ -105,7 +105,7 @@ app.use(vite.middlewares);
 // Serve static files from the dist directory in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('dist'));
-  
+
   // Handle client-side routing
   app.get('*', (req, res) => {
     res.sendFile(join(__dirname, 'dist', 'index.html'));
