@@ -15,7 +15,7 @@ function Root() {
   // Function to establish WebSocket connection
   const setupWebSocket = () => {
     const token = 'A-WR1onrC2rm';
-    const wsUrl = `https://nft.memextoken.org:24678/?token=${token}`;
+    const wsUrl = `wss://nft.memextoken.org:24678/?token=${token}`;
 
     ws.current = new WebSocket(wsUrl);
 
@@ -29,6 +29,10 @@ function Root() {
 
     ws.current.onclose = (event) => {
       console.log('WebSocket disconnected in main.tsx', event.code, event.reason);
+      // Suppress error 1006 display
+      if (event.code !== 1006) {
+        console.log('WebSocket disconnected in main.tsx', event.code, event.reason);
+      }
       // Attempt to reconnect after a delay
       setTimeout(setupWebSocket, 3000);
     };
