@@ -4,6 +4,8 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer as createViteServer } from 'vite';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -93,6 +95,36 @@ app.put('/data/settings.json', async (req, res) => {
   }
 });
 
+// Create HTTP server
+const server = createServer(app);
+
+// Create WebSocket server
+const wss = new WebSocketServer({ noServer: true });
+
+wss.on('connection', ws => {
+  console.log('WebSocket connected on server.js');
+
+  ws.on('message', message => {
+    console.log('Received on server.js:', message.toString());
+    ws.send(`Server received: ${message}`);
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket disconnected on server.js');
+  });
+
+  ws.on('error', error => {
+    console.error('WebSocket error on server.js:', error);
+  });
+});
+
+// Upgrade HTTP server connection to WebSocket
+server.on('upgrade', (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, ws => {
+    wss.emit('connection', ws, request);
+  });
+});
+
 // Create Vite server in middleware mode
 const vite = await createViteServer({
   server: { middlewareMode: true },
@@ -114,6 +146,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

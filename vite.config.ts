@@ -13,11 +13,13 @@ export default defineConfig({
         target: 'wss://nft.memextoken.org:24678',
         secure: true,
         ws: true,
+        changeOrigin: true
       },
       'ws://nft.memextoken.org:24678': {
         target: 'wss://nft.memextoken.org:24678',
         secure: true,
         ws: true,
+        changeOrigin: true
       }
     },
     hmr: {
