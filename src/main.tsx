@@ -15,7 +15,7 @@ function Root() {
   // Function to establish WebSocket connection
   const setupWebSocket = () => {
     const token = 'A-WR1onrC2rm';
-    const wsUrl = `wss://nft.memextoken.org:24678/?token=${token}`; // Use wss
+    const wsUrl = `https://nft.memextoken.org:24678/?token=${token}`;
 
     ws.current = new WebSocket(wsUrl);
 
